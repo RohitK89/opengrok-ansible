@@ -1,0 +1,28 @@
+galaxy_info:
+  author: Rohit Kapur
+  description:
+  company:
+
+  license: license (GPLv2, CC-BY, etc)
+
+  min_ansible_version: 2.0
+
+  platforms:
+  - name: GenericUNIX
+    versions:
+    - all
+  - name: EL
+    versions:
+    - all
+  - name: Ubuntu
+    versions:
+    - all
+  - name: Debian
+    versions:
+    - all
+
+  galaxy_tags:
+    - opengrok
+    - installer
+
+dependencies: []

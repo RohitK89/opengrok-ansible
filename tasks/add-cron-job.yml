@@ -1,0 +1,15 @@
+---
+- name: Set crontab environment
+  cron:
+    env: yes
+    name: "{{ item.key }}"
+    value : "{{ item.value }}"
+    user: opengrok
+  with_dict: "{{ opengrok_env }}"
+
+- name: Cron for updating OpenGrok index
+  cron:
+    name: "Update OpenGrok index hourly"
+    minute: 0
+    job: "{{ opengrok_root }}/opengrok-{{ opengrok_version }}/bin/OpenGrok index {{ opengrok_src_root }}"
+    user: opengrok

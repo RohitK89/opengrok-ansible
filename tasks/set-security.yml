@@ -1,0 +1,64 @@
+---
+- name: Stop tomcat if running
+  service:
+    name: "{{ opengrok_pkg_tomcat }}"
+    state: stopped
+
+- name: Copy cert for LDAP server
+  copy:
+    content: "{{ opengrok_ldap_cert.public_key }}"
+    dest: "{{ opengrok_user_basedir }}/{{ opengrok_ldap_cert.filename }}"
+  when: opengrok_add_ldaps is defined and opengrok_add_ldaps
+
+- name: Get path to JVM
+  shell: ls -d {{ opengrok_java_home }}
+  register: opengrok_java_home_expanded
+
+- name: Path used for JVM
+  debug:
+    var: opengrok_java_home_expanded
+
+- name: Add cert to Java keystore
+  command: 'keytool -import -noprompt -trustcacerts -storepass {{ opengrok_keystore_pass }} -file "{{ opengrok_user_basedir }}/{{ opengrok_ldap_cert.filename }}" -alias "LDAP Server Public Key" -keystore "jre/lib/security/cacerts"'
+  args:
+    chdir: "{{ opengrok_java_home_expanded.stdout }}"
+  when: opengrok_add_ldaps is defined and opengrok_add_ldaps
+
+- name: Configure LDAP server in Tomcat
+  blockinfile:
+    dest: "{{ opengrok_tomcat_conf_dir }}/server.xml"
+    insertafter: '\<Realm className="org\.apache\.catalina\.realm\.LockOutRealm"\>$'
+    marker: '<!-- {mark} ANSIBLE MANAGED BLOCK -->'
+    content: "{{ opengrok_tomcat_xml_ldap_addition }}"
+
+- name: Remove UserDatabase Realm from Tomcat config
+  replace:
+    dest: "{{ opengrok_tomcat_conf_dir }}/server.xml"
+    regexp: '^\s*<Realm className="org\.apache\.catalina\.realm\.UserDatabaseRealm"(\s){16}resourceName="UserDatabase"\/>$'
+  when: opengrok_remove_user_db_realm is defined and opengrok_remove_user_db_realm
+
+- name: Extract the opengrok war's config XML file
+  command: 'unzip source.war WEB-INF/web.xml'
+  args:
+    chdir: "{{ opengrok_env.OPENGROK_TOMCAT_BASE }}/webapps"
+    creates: "{{ opengrok_env.OPENGROK_TOMCAT_BASE }}/webapps/WEB-INF/web.xml"
+
+- name: Configure LDAP auth for the opengrok war
+  blockinfile:
+    dest: "{{ opengrok_env.OPENGROK_TOMCAT_BASE }}/webapps/WEB-INF/web.xml"
+    insertafter: '\<web-app\>$'
+    marker: '<!-- {mark} ANSIBLE MANAGED BLOCK -->'
+    content: "{{ opengrok_source_xml_ldap_addition }}"
+
+- name: Update configuration.xml path for OpenGrok
+  lineinfile:
+    dest: "{{ opengrok_env.OPENGROK_TOMCAT_BASE }}/webapps/WEB-INF/web.xml"
+    regexp: '^(\s*<param-value>)\/var\/opengrok\/etc\/configuration\.xml(<\/param-value>)$'
+    line: '\1{{ opengrok_env.OPENGROK_INSTANCE_BASE }}/etc/configuration.xml\2'
+    backrefs: yes
+    state: present
+
+- name: Repackage war file
+  command: 'zip source.war WEB-INF/web.xml'
+  args:
+    chdir: "{{ opengrok_env.OPENGROK_TOMCAT_BASE }}/webapps"

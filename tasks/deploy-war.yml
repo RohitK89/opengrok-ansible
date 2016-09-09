@@ -1,0 +1,8 @@
+---
+- name: Deploy opengrok to tomcat
+  command: ./OpenGrok deploy
+  args:
+    chdir: "{{ opengrok_root }}/opengrok-{{ opengrok_version }}/bin/"
+    creates: "{{ opengrok_env.OPENGROK_TOMCAT_BASE }}/webapps/source.war"
+  environment: "{{ opengrok_env }}"
+  become: true

@@ -1,0 +1,20 @@
+---
+opengrok_base_dir: /var
+opengrok_src_root: "{{ opengrok_base_dir }}/opengrok/src"
+opengrok_etc_dir: "{{ opengrok_base_dir }}/opengrok/etc"
+
+opengrok_user_basedir: "{{ opengrok_base_dir }}/opengrok"
+
+opengrok_root: /usr
+opengrok_data_dir: "{{ opengrok_base_dir }}/opengrok/data"
+
+opengrok_version: 0.12.1.5
+opengrok_pkg_url: "https://github.com/OpenGrok/OpenGrok/files/213268/opengrok-{{ opengrok_version }}.tar.gz"
+
+opengrok_env:
+  OPENGROK_TOMCAT_BASE: "/var/lib/{{ opengrok_pkg_tomcat }}"
+  OPENGROK_INSTANCE_BASE: "{{ opengrok_base_dir }}/opengrok"
+  OPENGROK_VERBOSE: true
+
+opengrok_java_home: "/usr/lib/jvm/java-1.7.0-openjdk*"
+opengrok_tomcat_conf_dir: "/etc/{{ opengrok_pkg_tomcat }}"

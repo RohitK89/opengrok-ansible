@@ -1,0 +1,54 @@
+---
+# Jinja2 template file that, when populated with values for the variables, can act as a playbook
+# to deploy OpenGrok with LDAP security configured
+- hosts: localhost
+  vars:
+    opengrok_add_security: true
+    opengrok_add_ldaps: true
+
+    opengrok_keystore_pass: "{{ opengrok_java_keystore_pass }}"
+
+    opengrok_ldap_cert:
+      public_key: "{{ opengrok_ldap_public_key }}"
+      filename: "{{ opengrok_ldap_pk_filename }}"
+
+    # Don't allow authentication using default tomcat creds
+    opengrok_remove_user_db_realm: "{{ opengrok_remove_user_db_realm }}"
+
+    opengrok_source_xml_ldap_addition: |
+       <security-constraint>
+           <web-resource-collection>
+               <web-resource-name>OpenGrok</web-resource-name>
+               <url-pattern>/</url-pattern>
+               <url-pattern>/xref/*</url-pattern>
+               <url-pattern>/source/*</url-pattern>
+           </web-resource-collection>
+           <auth-constraint>
+             <role-name>"{{ item }}"</role-name>
+            </auth-constraint>
+       </security-constraint>
+       <login-config>
+           <auth-method>BASIC</auth-method>
+       </login-config>
+       <security-role>
+           <role-name>"{{ item }}"</role-name>
+       </security-role>
+    with_items: "{{ opengrok_ldap_roles }}"
+
+    opengrok_tomcat_xml_ldap_addition: |
+       <Realm className="org.apache.catalina.realm.JNDIRealm"
+           connectionURL="{{ opengrok_primary_ldap_server }}"
+           alternateURL="{{ opengrok_secondary_ldap_server }}"
+           connectionName="{{ opengrok_ldap_auth_username }}"
+           connectionPassword="{{ opengrok_ldap_auth_password }}"
+           userBase="{{ opengrok_ldap_userBase }}"
+           userSearch="{{ opengrok_ldap_userSearch }}"
+           userSubtree="{{ opengrok_ldap_userSubtree }}"
+           roleBase="{{ opengrok_ldap_roleBase }}"
+           roleName="{{ opengrok_ldap_roleName }}"
+           roleSubtree="{{ opengrok_ldap_roleSubtree }}"
+           roleSearch="{{ opengrok_ldap_roleSearch }}"
+           userRoleName="{{ opengrok_ldap_userRoleName }}"
+       />
+  roles:
+    - opengrok

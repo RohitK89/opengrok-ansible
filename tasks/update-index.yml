@@ -1,0 +1,8 @@
+---
+- name: Update OpenGrok index
+  command: ./OpenGrok index "{{ opengrok_src_root }}"
+  args:
+    chdir: "{{ opengrok_root }}/opengrok-{{ opengrok_version }}/bin"
+  environment: "{{ opengrok_env }}"
+  become: true
+  become_user: opengrok

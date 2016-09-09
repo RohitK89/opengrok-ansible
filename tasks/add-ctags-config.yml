@@ -1,0 +1,7 @@
+---
+- name: Add ctags conf for VB
+  template:
+    src: files/ctags.conf
+    dest: "{{ opengrok_user_basedir }}/etc/ctags.conf"
+    mode: 0644
+    force: no

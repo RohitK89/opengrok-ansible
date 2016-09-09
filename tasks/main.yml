@@ -1,0 +1,40 @@
+---
+- name: Create opengrok user
+  user:
+    name: opengrok
+    home: "{{ opengrok_user_basedir }}"
+  become: true
+
+- name: Create folders
+  include: make-folders.yml
+
+- name: Install dependencies
+  include: install-dependencies.yml
+  become: true
+
+- name: Deploy OpenGrok war to tomcat
+  include: deploy-war.yml
+
+  # Bonus/Freebie: This file adds parsing rules for VB code to ctags
+- name: Add ctags config for parsing VB code
+  include: add-ctags-config.yml
+  become_user: opengrok
+  become: true
+
+- name: Add LDAP security
+  include: set-security.yml
+  become: true
+  when: opengrok_add_security is defined and opengrok_add_security
+
+- name: Update OpenGrok index
+  include: update-index.yml
+
+- name: Add cron job to update OpenGrok index
+  include: add-cron-job.yml
+  become: true
+
+- name: Start tomcat7
+  service:
+    name: "{{ opengrok_pkg_tomcat }}"
+    state: started
+  become: true

@@ -1,0 +1,13 @@
+---
+- name: Make folders
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+  become_user: opengrok
+  become: true
+  with_items:
+    - "{{ opengrok_base_dir }}"
+    - "{{ opengrok_src_root }}"
+    - "{{ opengrok_data_dir }}"
+    - "{{ opengrok_etc_dir }}"

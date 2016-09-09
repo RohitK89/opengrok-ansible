@@ -1,0 +1,27 @@
+---
+- name: Include variables based on OS
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version | int}}.yml"
+    - "{{ ansible_distribution }}.yml"
+    - "{{ ansible_os_family }}.yml"
+    - "default.yml"
+
+- name: Install dependencies
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "{{ opengrok_pkg_jdk }}"
+    - "{{ opengrok_pkg_ctags }}"
+    - "{{ opengrok_pkg_tomcat }}"
+    - zip
+    - unzip
+
+- name: Download and extract opengrok
+  unarchive:
+    src: "{{ opengrok_pkg_url }}"
+    dest: "{{ opengrok_root }}"
+    copy: no
+  args:
+    creates: "{{ opengrok_root }}/opengrok-{{ opengrok_version }}/"

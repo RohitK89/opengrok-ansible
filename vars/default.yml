@@ -1,0 +1,4 @@
+---
+opengrok_pkg_jdk: openjdk-7-jdk
+opengrok_pkg_ctags: exuberant-ctags
+opengrok_pkg_tomcat: tomcat7

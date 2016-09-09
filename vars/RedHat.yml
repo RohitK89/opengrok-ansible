@@ -1,0 +1,4 @@
+---
+opengrok_pkg_jdk: java-1.7.0-openjdk
+opengrok_pkg_ctags: ctags
+opengrok_pkg_tomcat: tomcat
