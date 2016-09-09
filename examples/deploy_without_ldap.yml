@@ -2,4 +2,4 @@
 # Barebones deployment playbook for opengrok
 - hosts: localhost
   roles:
-    - opengrok
+    - opengrok-ansible
