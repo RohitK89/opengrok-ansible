@@ -51,4 +51,4 @@
            userRoleName="{{ opengrok_ldap_userRoleName }}"
        />
   roles:
-    - opengrok-ansible
+    - RohitK89.opengrok-ansible

@@ -4,6 +4,17 @@ OpenGrok
 An Ansible role that installs and deploys OpenGrok.
 For more info on OpenGrok, see: https://opengrok.github.io/OpenGrok/
 
+Installation
+------------
+
+Install the role through Ansible Galaxy:
+
+`ansible-galaxy install RohitK89.opengrok-ansible`
+
+You can then deploy OpenGrok by writing a custom playbook to suit your needs, or by using the ones in the examples folder.
+
+`sudo ansible-playbook deploy_without_ldap.yml`
+
 Requirements
 ------------
 
@@ -11,6 +22,7 @@ N/A
 
 Role Variables
 --------------
+
 ####Defaults
 `opengrok_base_dir`: The root dir in which OpenGrok should create all the further listed subfolders
 
